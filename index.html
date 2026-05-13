@@ -158,6 +158,13 @@ window.openModal = async function(photo) {
     setLikeUI(false);
     setSaveUI(false);
   }
+  // 削除ボタン：投稿者本人のみ表示
+  const deleteBtn = document.getElementById('delete-btn');
+  if (currentUser && currentUser.uid === photo.uploaderId) {
+    deleteBtn.style.display = 'flex';
+  } else {
+    deleteBtn.style.display = 'none';
+  }
   document.getElementById('modal').classList.add('open');
 }
 
@@ -211,6 +218,21 @@ window.toggleSave = async function() {
     await setDoc(saveRef, { userId: currentUser.uid, photoId: currentModalPhoto.id, imageUrl: currentModalPhoto.imageUrl, uploaderName: currentModalPhoto.uploaderName, createdAt: new Date() });
     setSaveUI(true);
     showToast('コレクションに保存しました ✨');
+  }
+}
+
+// ── 写真削除 ──
+window.deletePhoto = async function() {
+  if (!currentUser || !currentModalPhoto) return;
+  if (currentUser.uid !== currentModalPhoto.uploaderId) { showToast('削除できるのは投稿者本人だけです'); return; }
+  if (!confirm('この写真を削除しますか？')) return;
+  try {
+    await deleteDoc(doc(db, 'photos', currentModalPhoto.id));
+    await updateDoc(doc(db, 'users', currentUser.uid), { photoCount: increment(-1) });
+    closeModal();
+    showToast('写真を削除しました');
+  } catch(e) {
+    showToast('削除に失敗しました: ' + e.message);
   }
 }
 
@@ -645,6 +667,8 @@ document.addEventListener('DOMContentLoaded', () => {
   .auth-btn{width:100%;padding:14px;border-radius:var(--radius);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0d0d0f;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;margin-top:4px}
   .auth-close{padding:16px 20px 0;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text2);font-size:13px}
   /* トースト */
+  .delete-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;border-radius:var(--radius);border:1px solid rgba(224,85,85,0.4);background:rgba(224,85,85,0.1);font-size:13px;color:var(--red);cursor:pointer;transition:all .2s;margin-bottom:10px}
+  .delete-btn i{font-size:18px}
   .toast{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:12px;padding:10px 18px;border-radius:20px;white-space:nowrap;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none}
   .toast.show{opacity:1}
   /* ガード画面 */
@@ -807,6 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="modal-btn" id="save-btn" onclick="toggleSave()"><i class="ti ti-bookmark" id="save-icon"></i><span id="save-label">保存</span></div>
       </div>
       <div class="modal-profile-btn" onclick="closeModal();showScreen('profile')">このコスプレイヤーのプロフィールを見る →</div>
+      <div class="delete-btn" id="delete-btn" onclick="deletePhoto()" style="display:none;margin-top:10px"><i class="ti ti-trash"></i>この写真を削除する</div>
     </div>
   </div>
 
