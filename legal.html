@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>利用規約・プライバシーポリシー｜コスプレミュージアム</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --bg2: #141416;
+    --bg3: #1c1c20;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0ede8;
+    --text2: #9e9b95;
+    --text3: #5a5855;
+    --accent: #c9a96e;
+    --accent2: #e8c99a;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; line-height: 1.8; }
+
+  /* ヘッダー */
+  .site-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(13,13,15,0.95); backdrop-filter: blur(20px); z-index: 10; }
+  .logo { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--accent); letter-spacing: 0.04em; text-decoration: none; }
+  .logo span { font-style: italic; font-weight: 400; }
+  .back-btn { font-size: 13px; color: var(--text2); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+  .back-btn::before { content: '←'; }
+
+  /* タブ */
+  .tabs { display: flex; border-bottom: 1px solid var(--border); position: sticky; top: 57px; background: var(--bg); z-index: 9; }
+  .tab { flex: 1; text-align: center; padding: 14px 8px; font-size: 13px; color: var(--text3); border-bottom: 2px solid transparent; cursor: pointer; transition: all .2s; text-decoration: none; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+  /* コンテンツ */
+  .content { max-width: 680px; margin: 0 auto; padding: 32px 24px 80px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .doc-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--accent); margin-bottom: 6px; }
+  .doc-date { font-size: 12px; color: var(--text3); margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+
+  h2 { font-size: 16px; font-weight: 700; color: var(--text); margin: 28px 0 10px; padding-left: 12px; border-left: 3px solid var(--accent); }
+  h3 { font-size: 14px; font-weight: 500; color: var(--accent2); margin: 18px 0 8px; }
+  p { font-size: 14px; color: var(--text2); margin-bottom: 12px; }
+  ul, ol { padding-left: 20px; margin-bottom: 12px; }
+  li { font-size: 14px; color: var(--text2); margin-bottom: 6px; line-height: 1.7; }
+  .highlight { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 16px 20px; margin: 16px 0; }
+  .highlight p { margin-bottom: 0; }
+  .contact-box { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 20px; margin-top: 32px; }
+  .contact-box h3 { margin-top: 0; }
+  .contact-box a { color: var(--accent); text-decoration: none; }
+
+  /* フッター */
+  .site-footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 12px; color: var(--text3); }
+  .site-footer a { color: var(--text3); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="index.html">Cos<span>Museum</span></a>
+  <a class="back-btn" href="index.html">トップへ戻る</a>
+</header>
+
+<div class="tabs">
+  <a class="tab active" href="#terms" onclick="switchTab('terms',this)">利用規約</a>
+  <a class="tab" href="#privacy" onclick="switchTab('privacy',this)">プライバシーポリシー</a>
+</div>
+
+<div class="content">
+
+  <!-- 利用規約 -->
+  <div class="panel active" id="panel-terms">
+    <div class="doc-title">利用規約</div>
+    <div class="doc-date">制定日：2025年　最終更新日：2025年</div>
+
+    <p>本利用規約（以下「本規約」）は、コスプレミュージアム（以下「本サービス」）の利用条件を定めるものです。本サービスをご利用いただく前に、必ず本規約をお読みください。本サービスを利用した場合、本規約に同意したものとみなします。</p>
+
+    <h2>第1条（定義）</h2>
+    <ul>
+      <li>「本サービス」とは、コスプレミュージアムが運営するウェブサービスを指します。</li>
+      <li>「ユーザー」とは、本サービスを利用するすべての方を指します。</li>
+      <li>「コスプレイヤー」とは、本サービスにコスプレイヤーとして登録したユーザーを指します。</li>
+      <li>「投稿コンテンツ」とは、ユーザーが本サービスに投稿した写真・テキスト等を指します。</li>
+    </ul>
+
+    <h2>第2条（利用資格）</h2>
+    <ul>
+      <li>本サービスは、13歳以上の方がご利用いただけます。</li>
+      <li>13歳以上18歳未満の方は、保護者の同意を得た上でご利用ください。</li>
+      <li>過去に本サービスの利用を停止・禁止された方は、新たに登録することはできません。</li>
+    </ul>
+
+    <h2>第3条（アカウント）</h2>
+    <ul>
+      <li>ユーザーは正確な情報を登録する義務があります。</li>
+      <li>アカウントの管理はユーザー自身の責任で行ってください。</li>
+      <li>アカウントの第三者への譲渡・貸与は禁止します。</li>
+      <li>不正利用が判明した場合は直ちに運営者へご連絡ください。</li>
+    </ul>
+
+    <h2>第4条（投稿コンテンツ）</h2>
+    <h3>著作権・肖像権について</h3>
+    <div class="highlight">
+      <p>投稿できる写真は、投稿者自身が撮影した、または投稿の権利を有する写真に限ります。第三者が撮影した写真を投稿する場合は、撮影者の許諾を得てください。</p>
+    </div>
+    <ul>
+      <li>投稿コンテンツの著作権は投稿者に帰属します。</li>
+      <li>ユーザーは本サービスに対し、サービス運営に必要な範囲でコンテンツを利用する権利を許諾するものとします。</li>
+      <li>コスプレ衣装・キャラクターに関する権利は、それぞれの権利者に帰属します。</li>
+    </ul>
+
+    <h2>第5条（禁止事項）</h2>
+    <p>以下の行為を禁止します。</p>
+    <ul>
+      <li>他者の著作権・肖像権・プライバシーを侵害するコンテンツの投稿</li>
+      <li>性的・暴力的・差別的なコンテンツの投稿</li>
+      <li>未成年者が不適切なコンテンツに接触させる行為</li>
+      <li>他のユーザーへの誹謗中傷・嫌がらせ</li>
+      <li>スパム・広告目的の投稿</li>
+      <li>本サービスのシステムへの不正アクセス</li>
+      <li>虚偽の情報の登録・投稿</li>
+      <li>その他、法令または公序良俗に反する行為</li>
+    </ul>
+
+    <h2>第6条（コンテンツの削除）</h2>
+    <p>運営者は、以下の場合にコンテンツを削除または投稿者のアカウントを停止することができます。</p>
+    <ul>
+      <li>本規約に違反すると判断した場合</li>
+      <li>第三者から権利侵害の申告を受けた場合</li>
+      <li>その他、運営上必要と判断した場合</li>
+    </ul>
+
+    <h2>第7条（免責事項）</h2>
+    <ul>
+      <li>本サービスは現状有姿で提供されます。運営者は本サービスの完全性・正確性・安全性を保証しません。</li>
+      <li>ユーザー間のトラブルについて、運営者は一切の責任を負いません。</li>
+      <li>本サービスの利用により生じた損害について、運営者は責任を負いません。</li>
+    </ul>
+
+    <h2>第8条（規約の変更）</h2>
+    <p>運営者は必要に応じて本規約を変更できます。変更後は本ページに掲載し、重要な変更の場合はサービス内でお知らせします。</p>
+
+    <h2>第9条（準拠法・管轄裁判所）</h2>
+    <p>本規約は日本法に準拠します。本サービスに関する紛争は、運営者の所在地を管轄する裁判所を第一審の専属的合意管轄とします。</p>
+
+    <div class="contact-box">
+      <h3>お問い合わせ</h3>
+      <p>本規約に関するお問い合わせは、本サービス内のお問い合わせフォームよりご連絡ください。</p>
+    </div>
+  </div>
+
+  <!-- プライバシーポリシー -->
+  <div class="panel" id="panel-privacy">
+    <div class="doc-title">プライバシーポリシー</div>
+    <div class="doc-date">制定日：2025年　最終更新日：2025年</div>
+
+    <p>コスプレミュージアム（以下「本サービス」）は、ユーザーの個人情報の取り扱いについて、以下の通りプライバシーポリシーを定めます。</p>
+
+    <h2>第1条（収集する情報）</h2>
+    <h3>ユーザーが提供する情報</h3>
+    <ul>
+      <li>メールアドレス（会員登録時）</li>
+      <li>表示名（会員登録時）</li>
+      <li>活動エリア・ジャンル・自己紹介（コスプレイヤー登録時・任意）</li>
+      <li>SNSアカウントのURL（任意）</li>
+      <li>投稿した写真・テキスト</li>
+    </ul>
+
+    <h3>自動的に収集される情報</h3>
+    <ul>
+      <li>アクセスログ（IPアドレス・ブラウザ情報・アクセス日時）</li>
+      <li>Cookie・ローカルストレージの情報</li>
+      <li>Google Analyticsによる利用状況データ</li>
+    </ul>
+
+    <h2>第2条（情報の利用目的）</h2>
+    <ul>
+      <li>本サービスの提供・運営・改善</li>
+      <li>ユーザーへのお知らせ・サポート対応</li>
+      <li>不正利用の防止・セキュリティ確保</li>
+      <li>利用状況の分析・統計処理</li>
+      <li>広告の配信（Google AdSense）</li>
+    </ul>
+
+    <h2>第3条（第三者提供）</h2>
+    <p>以下の場合を除き、個人情報を第三者に提供しません。</p>
+    <ul>
+      <li>ユーザーの同意がある場合</li>
+      <li>法令に基づく場合</li>
+      <li>人の生命・身体・財産の保護のために必要な場合</li>
+    </ul>
+
+    <h2>第4条（利用するサービス・SDK）</h2>
+    <div class="highlight">
+      <p>本サービスは以下の外部サービスを利用しています。各サービスのプライバシーポリシーもご確認ください。</p>
+    </div>
+    <ul>
+      <li><strong>Firebase（Google LLC）</strong>：認証・データベース管理。<br>
+      プライバシーポリシー：https://policies.google.com/privacy</li>
+      <li><strong>Cloudinary</strong>：画像の保存・配信。<br>
+      プライバシーポリシー：https://cloudinary.com/privacy</li>
+      <li><strong>Google Analytics（Google LLC）</strong>：アクセス解析。<br>
+      プライバシーポリシー：https://policies.google.com/privacy</li>
+      <li><strong>Google AdSense（Google LLC）</strong>：広告配信。<br>
+      プライバシーポリシー：https://policies.google.com/privacy</li>
+    </ul>
+
+    <h2>第5条（Cookieについて）</h2>
+    <p>本サービスはCookieを使用しています。ブラウザの設定でCookieを無効にすることができますが、一部の機能が利用できなくなる場合があります。</p>
+
+    <h2>第6条（個人情報の管理）</h2>
+    <ul>
+      <li>個人情報はFirebaseのセキュリティ機能により保護されます。</li>
+      <li>不要になった個人情報は適切に削除します。</li>
+    </ul>
+
+    <h2>第7条（ユーザーの権利）</h2>
+    <p>ユーザーは以下の権利を有します。</p>
+    <ul>
+      <li>登録情報の確認・修正（マイページより）</li>
+      <li>アカウントの削除（お問い合わせよりご依頼ください）</li>
+      <li>個人情報の開示・訂正・削除の請求</li>
+    </ul>
+
+    <h2>第8条（未成年者の個人情報）</h2>
+    <p>13歳未満のお子様の個人情報は収集しません。13歳以上18歳未満の方については、保護者の同意のもとでサービスをご利用ください。</p>
+
+    <h2>第9条（ポリシーの変更）</h2>
+    <p>本ポリシーは必要に応じて改定することがあります。重要な変更はサービス内でお知らせします。</p>
+
+    <div class="contact-box">
+      <h3>個人情報に関するお問い合わせ</h3>
+      <p>個人情報の取り扱いに関するご質問・ご依頼は、本サービス内のお問い合わせフォームよりご連絡ください。</p>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <p>© 2025 コスプレミュージアム　｜　<a href="index.html">トップへ戻る</a></p>
+</footer>
+
+<script>
+function switchTab(name, el) {
+  event.preventDefault();
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
