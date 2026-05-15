@@ -41,13 +41,8 @@ let currentModalPhoto = null;
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   updateAuthUI(user);
-  if (user) {
-    loadMuseum();
-    loadCosplayers();
-  } else {
-    loadMuseum();
-    loadCosplayers();
-  }
+  loadMuseum();
+  loadCosplayers();
 });
 
 // ── UI更新（ログイン状態） ──
@@ -72,12 +67,35 @@ function updateAuthUI(user) {
   }
 }
 
+// ── ミュージアムタブ切り替え ──
+window.switchMuseumTab = function(type, el) {
+  document.querySelectorAll('.mtab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  loadMuseum(type);
+}
+
 // ── ミュージアム（写真一覧）読み込み ──
-async function loadMuseum() {
+async function loadMuseum(type = 'all') {
   const grid = document.getElementById('photo-grid');
   grid.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">読み込み中...</div>';
   try {
-    const q = query(collection(db, 'photos'), orderBy('createdAt', 'desc'));
+    let q;
+    if (type === 'new') {
+      // 新着：24時間以内の投稿
+      const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      q = query(collection(db, 'photos'), orderBy('createdAt', 'desc'), where('createdAt', '>=', since));
+    } else if (type === 'follow' && currentUser) {
+      // フォロー中：フォローしているコスプレイヤーの写真
+      const followSnap = await getDocs(query(collection(db, 'follows'), where('followerId', '==', currentUser.uid)));
+      const followingIds = followSnap.docs.map(d => d.data().followingId);
+      if (followingIds.length === 0) {
+        grid.innerHTML = '<div style="padding:32px 20px;text-align:center;color:var(--text3);font-size:12px">フォロー中のコスプレイヤーがいません</div>';
+        return;
+      }
+      q = query(collection(db, 'photos'), where('uploaderId', 'in', followingIds.slice(0,10)), orderBy('createdAt', 'desc'));
+    } else {
+      q = query(collection(db, 'photos'), orderBy('createdAt', 'desc'));
+    }
     onSnapshot(q, (snapshot) => {
       if (snapshot.empty) {
         grid.innerHTML = '<div style="padding:32px 20px;text-align:center;color:var(--text3);font-size:12px">まだ写真がありません。最初の投稿者になりましょう！</div>';
@@ -129,7 +147,7 @@ async function loadCosplayers() {
           <div class="c-followers">フォロワー ${u.followerCount || 0}人</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-          <button class="follow-btn" data-uid="${u.id}" onclick="event.stopPropagation();toggleFollow(this,'${u.id}')">フォロー</button>
+          <button class="follow-btn" data-uid="${u.id}" data-action-follow="${u.id}">フォロー</button>
         </div>`;
       card.onclick = () => showProfile(u);
       list.appendChild(card);
@@ -382,7 +400,7 @@ async function loadMyFollowing() {
         <div class="fi-name">${u.displayName || ''}</div>
         <div class="fi-meta">${u.area || ''} · ${u.genre || ''}</div>
       </div>
-      <button class="follow-btn on" style="font-size:10px" onclick="toggleFollow(this,'${f.followingId}')">フォロー中</button>`;
+      <button class="follow-btn on" style="font-size:10px" data-action-follow="${f.followingId}">フォロー中</button>`;
     list.appendChild(item);
   }
   if (snap.empty) list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">フォロー中のコスプレイヤーはいません</div>';
@@ -505,6 +523,51 @@ window.switchMyTab = function(idx, el) {
 
 // ── チップ切り替え ──
 document.addEventListener('DOMContentLoaded', () => {
+  // ── data-action による一括イベント処理 ──
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const action = el.dataset.action;
+    const arg = el.dataset.arg;
+    switch(action) {
+      case 'showScreen': showScreen(arg); break;
+      case 'openAuthModal': openAuthModal(parseInt(arg)); break;
+      case 'closeAuthModal': closeAuthModal(); break;
+      case 'doSignOut': doSignOut(); break;
+      case 'closeModal': closeModal(); break;
+      case 'closeModal-showProfile': closeModal(); showScreen('profile'); break;
+      case 'toggleLike': toggleLike(); break;
+      case 'toggleSave': toggleSave(); break;
+      case 'deletePhoto': deletePhoto(); break;
+    }
+    // フォローボタン（動的生成）
+    const followTarget = e.target.closest('[data-action-follow]');
+    if (followTarget) {
+      e.stopPropagation();
+      toggleFollow(followTarget, followTarget.dataset.actionFollow);
+      return;
+      case 'switchAuthTab':
+        switchAuthTab(parseInt(arg)); break;
+      case 'switchMyTab':
+        document.querySelectorAll('.mytab').forEach(t => t.classList.remove('on'));
+        el.classList.add('on');
+        document.getElementById('my-collection').style.display = arg==='0' ? 'block' : 'none';
+        document.getElementById('my-follow').style.display = arg==='1' ? 'block' : 'none';
+        break;
+    }
+  });
+
+  // ミュージアムタブ
+  document.querySelectorAll('.mtab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const type = tab.dataset.tab;
+      if (!type) return;
+      document.querySelectorAll('.mtab').forEach(t => t.classList.remove('on'));
+      tab.classList.add('on');
+      loadMuseum(type);
+    });
+  });
+
   document.querySelectorAll('.chips').forEach(group => {
     group.querySelectorAll('.chip').forEach(chip => {
       chip.addEventListener('click', () => {
@@ -680,22 +743,21 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="device-frame">
 <div class="phone">
 
-  <div class="status-bar"><span>9:41</span><div class="status-icons"><i class="ti ti-wifi" style="font-size:13px"></i><i class="ti ti-battery" style="font-size:13px"></i></div></div>
 
   <div class="app-header">
     <div class="logo">Cos<span>Museum</span></div>
     <div class="header-actions">
       <i class="ti ti-bell"></i>
-      <i class="ti ti-user-circle" onclick="showScreen('mypage')"></i>
+      <i class="ti ti-user-circle" data-action="showScreen" data-arg="mypage"></i>
     </div>
   </div>
 
   <!-- ミュージアム -->
   <div class="screen active" id="screen-museum">
     <div class="museum-tabs">
-      <div class="mtab on">ミュージアム</div>
-      <div class="mtab">新着</div>
-      <div class="mtab">フォロー中</div>
+      <div class="mtab on" data-tab="all">ミュージアム</div>
+      <div class="mtab" data-tab="new">新着</div>
+      <div class="mtab" data-tab="follow">フォロー中</div>
     </div>
     <div class="chips">
       <div class="chip on">すべて</div><div class="chip">鬼滅の刃</div><div class="chip">呪術廻戦</div>
@@ -704,7 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="login-banner" id="login-banner" style="display:none">
       <i class="ti ti-sparkles"></i>
       <div class="login-banner-text">会員登録で写真を拡大・保存できます</div>
-      <div class="login-banner-btn" onclick="openAuthModal(0)">登録</div>
+      <div class="login-banner-btn" data-action="openAuthModal" data-arg="0">登録</div>
     </div>
     <div class="photo-grid" id="photo-grid"></div>
     <div class="ad-bar">広告スペース（Google AdSense）</div>
@@ -751,7 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="upload-guard" id="upload-guard" style="display:none">
       <i class="ti ti-camera" style="font-size:48px;color:var(--text3)"></i>
       <div style="font-size:14px;color:var(--text2);text-align:center">投稿するには会員登録が必要です</div>
-      <button class="guard-btn" onclick="openAuthModal(0)">会員登録 / ログイン</button>
+      <button class="guard-btn" data-action="openAuthModal" data-arg="0">会員登録 / ログイン</button>
     </div>
     <div style="padding:16px 20px 4px;font-size:16px;font-weight:500;color:var(--text)">写真を投稿する</div>
     <div style="padding:0 20px 12px;font-size:12px;color:var(--text3)">コスプレ写真をミュージアムに追加しましょう</div>
@@ -782,8 +844,8 @@ document.addEventListener('DOMContentLoaded', () => {
     <div class="mypage-login" id="mypage-login" style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px 24px;flex:1">
       <i class="ti ti-user-circle" style="font-size:56px;color:var(--text3)"></i>
       <div style="font-size:14px;color:var(--text2);text-align:center">ログインするとコレクションや<br>フォロー中が確認できます</div>
-      <button class="guard-btn" onclick="openAuthModal(1)">ログイン</button>
-      <div style="font-size:12px;color:var(--text3);cursor:pointer" onclick="openAuthModal(0)">アカウントをお持ちでない方はこちら</div>
+      <button class="guard-btn" data-action="openAuthModal" data-arg="1">ログイン</button>
+      <div style="font-size:12px;color:var(--text3);cursor:pointer" data-action="openAuthModal" data-arg="0">アカウントをお持ちでない方はこちら</div>
     </div>
     <div id="mypage-content" style="display:none">
       <div class="mypage-header">
@@ -795,11 +857,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="my-stat"><strong id="my-stat-follow">0</strong> フォロー中</div>
           </div>
         </div>
-        <div style="margin-left:auto;font-size:11px;color:var(--text3);cursor:pointer" onclick="doSignOut()">ログアウト</div>
+        <div style="margin-left:auto;font-size:11px;color:var(--text3);cursor:pointer" data-action="doSignOut">ログアウト</div>
       </div>
       <div class="my-tabs">
-        <div class="mytab on" onclick="switchMyTab(0,this)">コレクション</div>
-        <div class="mytab" onclick="switchMyTab(1,this)">フォロー中</div>
+        <div class="mytab on" data-action="switchMyTab" data-arg="0">コレクション</div>
+        <div class="mytab" data-action="switchMyTab" data-arg="1">フォロー中</div>
       </div>
       <div id="my-collection">
         <div style="padding:10px 16px 6px;font-size:11px;color:var(--text3);letter-spacing:.04em">保存した写真</div>
@@ -814,7 +876,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <!-- 写真モーダル -->
   <div class="modal-overlay" id="modal">
-    <div class="modal-close" onclick="closeModal()"><i class="ti ti-arrow-left"></i> 戻る</div>
+    <div class="modal-close" data-action="closeModal"><i class="ti ti-arrow-left"></i> 戻る</div>
     <div class="modal-img-wrap" id="modal-img-display"></div>
     <div class="modal-info">
       <div class="modal-char" id="modal-char"></div>
@@ -827,22 +889,22 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
       <div class="modal-actions">
-        <div class="modal-btn" id="like-btn" onclick="toggleLike()"><i class="ti ti-heart" id="like-icon"></i><span id="like-label">いいね</span></div>
-        <div class="modal-btn" id="save-btn" onclick="toggleSave()"><i class="ti ti-bookmark" id="save-icon"></i><span id="save-label">保存</span></div>
+        <div class="modal-btn" id="like-btn" data-action="toggleLike"><i class="ti ti-heart" id="like-icon"></i><span id="like-label">いいね</span></div>
+        <div class="modal-btn" id="save-btn" data-action="toggleSave"><i class="ti ti-bookmark" id="save-icon"></i><span id="save-label">保存</span></div>
       </div>
-      <div class="modal-profile-btn" onclick="closeModal();showScreen('profile')">このコスプレイヤーのプロフィールを見る →</div>
-      <div class="delete-btn" id="delete-btn" onclick="deletePhoto()" style="display:none;margin-top:10px"><i class="ti ti-trash"></i>この写真を削除する</div>
+      <div class="modal-profile-btn" data-action="closeModal-showProfile">このコスプレイヤーのプロフィールを見る →</div>
+      <div class="delete-btn" id="delete-btn" data-action="deletePhoto" style="display:none;margin-top:10px"><i class="ti ti-trash"></i>この写真を削除する</div>
     </div>
   </div>
 
   <!-- 認証モーダル -->
   <div class="auth-modal" id="auth-modal">
-    <div class="auth-close" onclick="closeAuthModal()"><i class="ti ti-x" style="font-size:18px"></i> 閉じる</div>
+    <div class="auth-close" data-action="closeAuthModal"><i class="ti ti-x" style="font-size:18px"></i> 閉じる</div>
     <div class="auth-inner">
       <div class="auth-title">Cos<span style="font-style:italic;font-weight:400">Museum</span></div>
       <div class="auth-tabs">
-        <div class="auth-tab on" onclick="switchAuthTab(0)">新規登録</div>
-        <div class="auth-tab" onclick="switchAuthTab(1)">ログイン</div>
+        <div class="auth-tab on" data-action="switchAuthTab" data-arg="0">新規登録</div>
+        <div class="auth-tab" data-action="switchAuthTab" data-arg="1">ログイン</div>
       </div>
       <!-- 新規登録フォーム -->
       <div id="signup-form">
@@ -874,10 +936,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <!-- ボトムナビ -->
   <div class="bottom-nav">
-    <div class="bn on" id="bn-museum" onclick="showScreen('museum')"><i class="ti ti-layout-grid"></i><span>ミュージアム</span></div>
-    <div class="bn" id="bn-list" onclick="showScreen('list')"><i class="ti ti-users"></i><span>一覧</span></div>
-    <div class="bn" id="bn-upload" onclick="showScreen('upload')"><i class="ti ti-circle-plus"></i><span>投稿</span></div>
-    <div class="bn" id="bn-mypage" onclick="showScreen('mypage')"><i class="ti ti-user"></i><span>マイページ</span></div>
+    <div class="bn on" id="bn-museum" data-action="showScreen" data-arg="museum"><i class="ti ti-layout-grid"></i><span>ミュージアム</span></div>
+    <div class="bn" id="bn-list" data-action="showScreen" data-arg="list"><i class="ti ti-users"></i><span>一覧</span></div>
+    <div class="bn" id="bn-upload" data-action="showScreen" data-arg="upload"><i class="ti ti-circle-plus"></i><span>投稿</span></div>
+    <div class="bn" id="bn-mypage" data-action="showScreen" data-arg="mypage"><i class="ti ti-user"></i><span>マイページ</span></div>
   </div>
 
 </div>
